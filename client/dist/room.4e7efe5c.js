@@ -7736,7 +7736,17 @@ exports.default = lookup;
 var _socket = require("socket.io-client");
 
 //path to server
-var socket = (0, _socket.io)('http://localhost:3000');
+console.log("development"); //will spit out  "development"
+
+var production = "development" === 'production'; //if false, fallback to devserver:
+
+var serverURL = production ? "realsiteurl.com" : 'http://localhost:300'; //get info from url query params IN CLIENT:
+
+var URLparams = new URLSearchParams(window.location.search); //adresspart after'?'
+
+var name = URLparams.get('name');
+var roomId = URLparams.get('room-id');
+var socket = (0, _socket.io)(serverURL);
 console.log(socket);
 },{"socket.io-client":"node_modules/socket.io-client/build/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
