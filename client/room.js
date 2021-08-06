@@ -42,8 +42,23 @@ readyBtn.addEventListener('click', ()=>{
     socket.emit('ready')
 })
 
+//fix the canvas scaling problem
+window.addEventListener('resize', resizeCanvas)
+
+function resizeCanvas(){
+    //reset to css
+    canvas.width = null
+    canvas.height = null
+    //then set them using new window size
+    const clientDimenstions = canvas.getBoundingClientRect()
+    canvas.width = clientDimenstions.width
+    canvas.height = clientDimenstions.height
+}
+
 //hide all UI elements except start button
 endRound()
+resizeCanvas()
+
 function endRound(){
     hide(guessForm)
 }

@@ -7767,6 +7767,9 @@ function DrowableCanvas(canvas, socket) {
 
     previousPosition = newPosition;
   });
+  canvas.addEventListener('mouseleave', function (e) {
+    previousPosition = null;
+  });
 
   function drawLine(start, end) {
     var ctx = canvas.getContext('2d');
@@ -7823,9 +7826,23 @@ socket.on('start-guesser', startRoundGuesser); //ready button event - emit event
 readyBtn.addEventListener('click', function () {
   hide(readyBtn);
   socket.emit('ready');
-}); //hide all UI elements except start button
+}); //fix the canvas scaling problem
+
+window.addEventListener('resize', resizeCanvas);
+
+function resizeCanvas() {
+  //reset to css
+  canvas.width = null;
+  canvas.height = null; //then set them using new window size
+
+  var clientDimenstions = canvas.getBoundingClientRect();
+  canvas.width = clientDimenstions.width;
+  canvas.height = clientDimenstions.height;
+} //hide all UI elements except start button
+
 
 endRound();
+resizeCanvas();
 
 function endRound() {
   hide(guessForm);

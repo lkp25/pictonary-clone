@@ -23,6 +23,9 @@ export default function DrowableCanvas(canvas, socket){
 
         previousPosition = newPosition
     })
+    canvas.addEventListener('mouseleave', e=>{
+        previousPosition = null
+    })
 
     function drawLine(start, end){
         const ctx = canvas.getContext('2d')
