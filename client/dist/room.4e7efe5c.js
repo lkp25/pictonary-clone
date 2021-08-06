@@ -7740,7 +7740,7 @@ console.log("development"); //will spit out  "development"
 
 var production = "development" === 'production'; //if false, fallback to devserver:
 
-var serverURL = production ? "realsiteurl.com" : 'http://localhost:300'; //get info from url query params IN CLIENT:
+var serverURL = production ? "realsiteurl.com" : 'http://localhost:3000'; //get info from url query params IN CLIENT:
 
 var URLparams = new URLSearchParams(window.location.search); //adresspart after'?'
 
@@ -7759,7 +7759,17 @@ var guessInput = document.querySelector('[data-guess-input');
 var wordElement = document.querySelector('[data-word');
 var messagesElement = document.querySelector('[data-messages');
 var readyBtn = document.querySelector('[data-ready-btn');
-var canvas = document.querySelector('[data-canvas'); //hide all UI elements except start button
+var canvas = document.querySelector('[data-canvas'); //emit event sending info to server with room id and username
+
+socket.emit('join-room', {
+  name: name,
+  roomId: roomId
+}); //ready button event - emit event to server and hide btn
+
+readyBtn.addEventListener('click', function () {
+  hide(readyBtn);
+  socket.emit('ready');
+}); //hide all UI elements except start button
 
 endRound();
 

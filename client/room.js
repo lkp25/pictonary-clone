@@ -4,7 +4,7 @@ console.log(process.env.NODE_ENV); //will spit out  "development"
 
 const production = process.env.NODE_ENV === 'production'
 //if false, fallback to devserver:
-const serverURL = production ? "realsiteurl.com" : 'http://localhost:300'
+const serverURL = production ? "realsiteurl.com" : 'http://localhost:3000'
 
 //get info from url query params IN CLIENT:
 const URLparams = new URLSearchParams(window.location.search) //adresspart after'?'
@@ -26,6 +26,15 @@ const wordElement = document.querySelector('[data-word')
 const messagesElement = document.querySelector('[data-messages')
 const readyBtn = document.querySelector('[data-ready-btn')
 const canvas = document.querySelector('[data-canvas')
+
+//emit event sending info to server with room id and username
+socket.emit('join-room', {name: name, roomId: roomId})
+
+//ready button event - emit event to server and hide btn
+readyBtn.addEventListener('click', ()=>{
+    hide(readyBtn)
+    socket.emit('ready')
+})
 
 //hide all UI elements except start button
 endRound()
