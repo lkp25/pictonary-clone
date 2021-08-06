@@ -30,6 +30,9 @@ const canvas = document.querySelector('[data-canvas')
 //emit event sending info to server with room id and username
 socket.emit('join-room', {name: name, roomId: roomId})
 
+socket.on('start-drawer', startRoundDrawer)
+socket.on('start-guesser', startRoundGuesser)
+
 //ready button event - emit event to server and hide btn
 readyBtn.addEventListener('click', ()=>{
     hide(readyBtn)
@@ -44,3 +47,17 @@ function endRound(){
 function hide(element){
     element.classList.add('hide')
 }
+function show(element){
+    
+    element.classList.remove('hide')
+}
+
+//functions for start drawer and guesser
+//drower has the word printed on screen
+ function startRoundDrawer(word){
+    wordElement.innerText = word
+ }
+ //guessers haw=ve the guess form available
+ function startRoundGuesser(){
+    show(guessForm)
+ }

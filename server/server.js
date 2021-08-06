@@ -15,6 +15,8 @@ const io = require('socket.io')(3000,
 
 //store rooms in memory:
 const rooms = {}
+//store words for guessing
+const WORDS = ["bike", 'human', "dog"]
 
 io.on('connection', socket =>{
     socket.on('join-room', data =>{
@@ -36,7 +38,12 @@ io.on('connection', socket =>{
         socket.on('ready', ()=>{
             user.ready = true
             if(room.users.every(u => u.ready)){
-                
+                room.word = getRandomEntry(WORDS)
+                room.guesser = getRandomEntry(room.users)
+                //send message to the person who draws -the word - using uniqe socket id:
+                io.to(room.guesser.id).emit('start-drawer', room.word)
+                //now send message from this person to everyone else(EXCLUDING him)
+                room.guesser.socket.to(room.id).emit('start-guesser')
             }
         })
 
@@ -47,3 +54,7 @@ io.on('connection', socket =>{
     })
     
 })
+
+function getRandomEntry(array){
+    return array[Math.floor(Math.random() * array.length)] 
+}
