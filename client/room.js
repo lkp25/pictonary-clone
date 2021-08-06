@@ -27,8 +27,8 @@ const wordElement = document.querySelector('[data-word]')
 const messagesElement = document.querySelector('[data-messages]')
 const readyBtn = document.querySelector('[data-ready-btn]')
 const canvas = document.querySelector('[data-canvas]')
-console.log(canvas);
 const drawbleCanvas = new DrowableCanvas(canvas, socket)
+const guessTemplate = document.querySelector('[data-guess-template]')
 
 //emit event sending info to server with room id and username
 socket.emit('join-room', {name: name, roomId: roomId})
@@ -36,14 +36,46 @@ socket.emit('join-room', {name: name, roomId: roomId})
 socket.on('start-drawer', startRoundDrawer)
 socket.on('start-guesser', startRoundGuesser)
 
-//ready button event - emit event to server and hide btn
-readyBtn.addEventListener('click', ()=>{
-    hide(readyBtn)
-    socket.emit('ready')
-})
+
 
 //fix the canvas scaling problem
 window.addEventListener('resize', resizeCanvas)
+
+//setub buttons functionality
+function setupHTMLEvents(){
+    //ready button event - emit event to server and hide btn
+    readyBtn.addEventListener('click', ()=>{
+    hide(readyBtn)
+    socket.emit('ready')
+    })
+
+    //setup gusser form submit
+    guessForm.addEventListener('submit', e=>{
+        e.preventDefault()
+        if(guessInput.value === "") return
+        //if there was something written, send it
+        socket.emit('make-guess', {guess: guessInput.value})
+        //display the guess on screen and person name
+        displayGuess(name, guessInput.value)
+        guessInput.value = ''
+    })
+}
+//hide all UI elements except start button
+endRound()
+resizeCanvas()
+setupHTMLEvents()
+
+function displayGuess(guesserName, guess){
+    //use the template in roomhtml to display new guess
+    const guessElement = guessTemplate.content.cloneNode(true)
+    const messageElement = guessElement.querySelector('[data-text]')
+    const nameElement = guessElement.querySelector('[data-name]')
+
+    nameElement.innerText = guesserName
+    messageElement.innerText = guess
+
+    messagesElement.append(guessElement)
+}
 
 function resizeCanvas(){
     //reset to css
@@ -55,9 +87,6 @@ function resizeCanvas(){
     canvas.height = clientDimenstions.height
 }
 
-//hide all UI elements except start button
-endRound()
-resizeCanvas()
 
 function endRound(){
     hide(guessForm)

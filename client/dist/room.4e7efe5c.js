@@ -7842,22 +7842,52 @@ var wordElement = document.querySelector('[data-word]');
 var messagesElement = document.querySelector('[data-messages]');
 var readyBtn = document.querySelector('[data-ready-btn]');
 var canvas = document.querySelector('[data-canvas]');
-console.log(canvas);
-var drawbleCanvas = new _DrowableCanvas.default(canvas, socket); //emit event sending info to server with room id and username
+var drawbleCanvas = new _DrowableCanvas.default(canvas, socket);
+var guessTemplate = document.querySelector('[data-guess-template]'); //emit event sending info to server with room id and username
 
 socket.emit('join-room', {
   name: name,
   roomId: roomId
 });
 socket.on('start-drawer', startRoundDrawer);
-socket.on('start-guesser', startRoundGuesser); //ready button event - emit event to server and hide btn
+socket.on('start-guesser', startRoundGuesser); //fix the canvas scaling problem
 
-readyBtn.addEventListener('click', function () {
-  hide(readyBtn);
-  socket.emit('ready');
-}); //fix the canvas scaling problem
+window.addEventListener('resize', resizeCanvas); //setub buttons functionality
 
-window.addEventListener('resize', resizeCanvas);
+function setupHTMLEvents() {
+  //ready button event - emit event to server and hide btn
+  readyBtn.addEventListener('click', function () {
+    hide(readyBtn);
+    socket.emit('ready');
+  }); //setup gusser form submit
+
+  guessForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (guessInput.value === "") return; //if there was something written, send it
+
+    socket.emit('make-guess', {
+      guess: guessInput.value
+    }); //display the guess on screen and person name
+
+    displayGuess(name, guessInput.value);
+    guessInput.value = '';
+  });
+} //hide all UI elements except start button
+
+
+endRound();
+resizeCanvas();
+setupHTMLEvents();
+
+function displayGuess(guesserName, guess) {
+  //use the template in roomhtml to display new guess
+  var guessElement = guessTemplate.content.cloneNode(true);
+  var messageElement = guessElement.querySelector('[data-text]');
+  var nameElement = guessElement.querySelector('[data-name]');
+  nameElement.innerText = guesserName;
+  messageElement.innerText = guess;
+  messagesElement.append(guessElement);
+}
 
 function resizeCanvas() {
   //reset to css
@@ -7867,11 +7897,7 @@ function resizeCanvas() {
   var clientDimenstions = canvas.getBoundingClientRect();
   canvas.width = clientDimenstions.width;
   canvas.height = clientDimenstions.height;
-} //hide all UI elements except start button
-
-
-endRound();
-resizeCanvas();
+}
 
 function endRound() {
   hide(guessForm); //no drawing possible when round ends
