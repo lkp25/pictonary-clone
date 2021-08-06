@@ -7741,14 +7741,17 @@ exports.default = DrowableCanvas;
 var _process = require("process");
 
 function DrowableCanvas(canvas, socket) {
+  var _this = this;
+
   //this function returns the THIS object automatically. it only has properties initialized with this keyword
   // this.canvas = canvas
   // //this variable will be private - only available here and not on the instance of DrawableCanvas
   // let w = "w"
+  this.canDraw = false;
   var previousPosition = null;
   canvas.addEventListener('mousemove', function (e) {
-    //if left mouse button is not pressed, exitthe function - no drawing
-    if (e.buttons !== 1) {
+    //if left mouse button is not pressed, or the canvas is canDraw-false,exitthe function - no drawing
+    if (e.buttons !== 1 || !_this.canDraw) {
       //stopped drawing: reset prevpos
       previousPosition = null;
       return;
@@ -7762,13 +7765,22 @@ function DrowableCanvas(canvas, socket) {
 
     if (previousPosition != null) {
       //draw the line
-      drawLine(previousPosition, newPosition);
+      drawLine(previousPosition, newPosition); //emit the drawing to the server
+
+      socket.emit('draw', {
+        start: normalizePosition(previousPosition),
+        end: normalizePosition(newPosition)
+      });
     }
 
     previousPosition = newPosition;
   });
   canvas.addEventListener('mouseleave', function (e) {
     previousPosition = null;
+  }); //listen for somebody else draw:
+
+  socket.on('draw-line', function (start, end) {
+    drawLine(toCanvasSpace(start), toCanvasSpace(end));
   });
 
   function drawLine(start, end) {
@@ -7777,6 +7789,23 @@ function DrowableCanvas(canvas, socket) {
     ctx.moveTo(start.x, start.y);
     ctx.lineTo(end.x, end.y);
     ctx.stroke();
+  } //size conversion function- each user has different window size so it must be normalized
+  //convert from the drawers window size to 0-1 fraction
+
+
+  function normalizePosition(position) {
+    return {
+      x: position.x / canvas.width,
+      y: position.y / canvas.height
+    };
+  } //convert from 0-1  fraction to actual width of individual user window
+
+
+  function toCanvasSpace(normalizedPosition) {
+    return {
+      x: normalizedPosition.x * canvas.width,
+      y: normalizedPosition.y * canvas.height
+    };
   }
 }
 },{"process":"node_modules/process/browser.js"}],"room.js":[function(require,module,exports) {
@@ -7845,7 +7874,9 @@ endRound();
 resizeCanvas();
 
 function endRound() {
-  hide(guessForm);
+  hide(guessForm); //no drawing possible when round ends
+
+  drawbleCanvas.canDraw = false;
 }
 
 function hide(element) {
@@ -7859,7 +7890,9 @@ function show(element) {
 
 
 function startRoundDrawer(word) {
-  wordElement.innerText = word;
+  wordElement.innerText = word; //unable drawing on canvas for drawer
+
+  drawbleCanvas.canDraw = true;
 } //guessers haw=ve the guess form available
 
 

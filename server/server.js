@@ -46,6 +46,10 @@ io.on('connection', socket =>{
                 room.guesser.socket.to(room.id).emit('start-guesser')
             }
         })
+        //listen for drawing
+        socket.on('draw', (data)=>{
+            socket.to(room.id).emit('draw-line', data.start, data.end)
+        })
 
         //if user disconnects, remove him from room:
         socket.on('disconnect', () =>{

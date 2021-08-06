@@ -61,6 +61,9 @@ resizeCanvas()
 
 function endRound(){
     hide(guessForm)
+    //no drawing possible when round ends
+    drawbleCanvas.canDraw = false
+
 }
 function hide(element){
     element.classList.add('hide')
@@ -74,6 +77,8 @@ function show(element){
 //drower has the word printed on screen
  function startRoundDrawer(word){
     wordElement.innerText = word
+    //unable drawing on canvas for drawer
+    drawbleCanvas.canDraw = true
  }
  //guessers haw=ve the guess form available
  function startRoundGuesser(){
