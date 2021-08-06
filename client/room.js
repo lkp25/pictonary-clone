@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import DrowableCanvas from "./DrowableCanvas"
 //path to server
 console.log(process.env.NODE_ENV); //will spit out  "development"
 
@@ -20,12 +21,14 @@ const socket = io(serverURL)
 console.log(socket);
 
 //get the fields in the room:
-const guessForm = document.querySelector('[data-guess-form')
-const guessInput = document.querySelector('[data-guess-input')
-const wordElement = document.querySelector('[data-word')
-const messagesElement = document.querySelector('[data-messages')
-const readyBtn = document.querySelector('[data-ready-btn')
-const canvas = document.querySelector('[data-canvas')
+const guessForm = document.querySelector('[data-guess-form]')
+const guessInput = document.querySelector('[data-guess-input]')
+const wordElement = document.querySelector('[data-word]')
+const messagesElement = document.querySelector('[data-messages]')
+const readyBtn = document.querySelector('[data-ready-btn]')
+const canvas = document.querySelector('[data-canvas]')
+console.log(canvas);
+const drawbleCanvas = new DrowableCanvas(canvas, socket)
 
 //emit event sending info to server with room id and username
 socket.emit('join-room', {name: name, roomId: roomId})

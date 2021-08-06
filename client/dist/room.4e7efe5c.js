@@ -7730,10 +7730,60 @@ Object.defineProperty(exports, "Socket", {
   }
 });
 exports.default = lookup;
-},{"./url":"node_modules/socket.io-client/build/url.js","./manager":"node_modules/socket.io-client/build/manager.js","debug":"node_modules/debug/src/browser.js","socket.io-parser":"node_modules/socket.io-parser/dist/index.js","./socket":"node_modules/socket.io-client/build/socket.js"}],"room.js":[function(require,module,exports) {
+},{"./url":"node_modules/socket.io-client/build/url.js","./manager":"node_modules/socket.io-client/build/manager.js","debug":"node_modules/debug/src/browser.js","socket.io-parser":"node_modules/socket.io-parser/dist/index.js","./socket":"node_modules/socket.io-client/build/socket.js"}],"DrowableCanvas.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = DrowableCanvas;
+
+var _process = require("process");
+
+function DrowableCanvas(canvas, socket) {
+  //this function returns the THIS object automatically. it only has properties initialized with this keyword
+  // this.canvas = canvas
+  // //this variable will be private - only available here and not on the instance of DrawableCanvas
+  // let w = "w"
+  var previousPosition = null;
+  canvas.addEventListener('mousemove', function (e) {
+    //if left mouse button is not pressed, exitthe function - no drawing
+    if (e.buttons !== 1) {
+      //stopped drawing: reset prevpos
+      previousPosition = null;
+      return;
+    } //get the finish position ofdraw line on canvas
+
+
+    var newPosition = {
+      x: e.layerX,
+      y: e.layerY
+    };
+
+    if (previousPosition != null) {
+      //draw the line
+      drawLine(previousPosition, newPosition);
+    }
+
+    previousPosition = newPosition;
+  });
+
+  function drawLine(start, end) {
+    var ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+  }
+}
+},{"process":"node_modules/process/browser.js"}],"room.js":[function(require,module,exports) {
 "use strict";
 
 var _socket = require("socket.io-client");
+
+var _DrowableCanvas = _interopRequireDefault(require("./DrowableCanvas"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 //path to server
 console.log("development"); //will spit out  "development"
@@ -7754,12 +7804,14 @@ if (!name || !roomId) {
 var socket = (0, _socket.io)(serverURL);
 console.log(socket); //get the fields in the room:
 
-var guessForm = document.querySelector('[data-guess-form');
-var guessInput = document.querySelector('[data-guess-input');
-var wordElement = document.querySelector('[data-word');
-var messagesElement = document.querySelector('[data-messages');
-var readyBtn = document.querySelector('[data-ready-btn');
-var canvas = document.querySelector('[data-canvas'); //emit event sending info to server with room id and username
+var guessForm = document.querySelector('[data-guess-form]');
+var guessInput = document.querySelector('[data-guess-input]');
+var wordElement = document.querySelector('[data-word]');
+var messagesElement = document.querySelector('[data-messages]');
+var readyBtn = document.querySelector('[data-ready-btn]');
+var canvas = document.querySelector('[data-canvas]');
+console.log(canvas);
+var drawbleCanvas = new _DrowableCanvas.default(canvas, socket); //emit event sending info to server with room id and username
 
 socket.emit('join-room', {
   name: name,
@@ -7797,7 +7849,7 @@ function startRoundDrawer(word) {
 function startRoundGuesser() {
   show(guessForm);
 }
-},{"socket.io-client":"node_modules/socket.io-client/build/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"socket.io-client":"node_modules/socket.io-client/build/index.js","./DrowableCanvas":"DrowableCanvas.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
