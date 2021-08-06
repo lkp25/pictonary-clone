@@ -7745,9 +7745,31 @@ var serverURL = production ? "realsiteurl.com" : 'http://localhost:300'; //get i
 var URLparams = new URLSearchParams(window.location.search); //adresspart after'?'
 
 var name = URLparams.get('name');
-var roomId = URLparams.get('room-id');
+var roomId = URLparams.get('room-id'); //no room name or id in query? redirect to homepage
+
+if (!name || !roomId) {
+  window.location = "index.html";
+}
+
 var socket = (0, _socket.io)(serverURL);
-console.log(socket);
+console.log(socket); //get the fields in the room:
+
+var guessForm = document.querySelector('[data-guess-form');
+var guessInput = document.querySelector('[data-guess-input');
+var wordElement = document.querySelector('[data-word');
+var messagesElement = document.querySelector('[data-messages');
+var readyBtn = document.querySelector('[data-ready-btn');
+var canvas = document.querySelector('[data-canvas'); //hide all UI elements except start button
+
+endRound();
+
+function endRound() {
+  hide(guessForm);
+}
+
+function hide(element) {
+  element.classList.add('hide');
+}
 },{"socket.io-client":"node_modules/socket.io-client/build/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -7776,7 +7798,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57881" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61416" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
