@@ -7,7 +7,10 @@ export default function DrowableCanvas(canvas, socket){
     // let w = "w"
     this.canDraw = false
     let previousPosition = null
-    
+    this.clearCanvas = function (){
+        const ctx = canvas.getContext('2d')
+        ctx.clearRect(0,0,canvas.width,canvas.height)
+    }
     canvas.addEventListener('mousemove', e=>{
         //if left mouse button is not pressed, or the canvas is canDraw-false,exitthe function - no drawing
         if(e.buttons !== 1 || !this.canDraw){
@@ -38,6 +41,7 @@ export default function DrowableCanvas(canvas, socket){
         drawLine(toCanvasSpace(start), toCanvasSpace(end))
     })
 
+    
     function drawLine(start, end){
         const ctx = canvas.getContext('2d')
         ctx.beginPath()

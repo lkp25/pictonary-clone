@@ -1,3 +1,7 @@
+//if we send from socket, we send for everyone BUT this socket who sends.
+// if we send from io, we send TO EVERYONE INCLUDING the socket that generates the emit
+
+
 //true or false production?
 const production = process.env.NODE_ENV === 'production'
 //if false, fallbeck to devserver:
@@ -46,6 +50,20 @@ io.on('connection', socket =>{
                 room.guesser.socket.to(room.id).emit('start-guesser')
             }
         })
+        //get all the guesses
+        socket.on('make-guess', data =>{
+            socket.to(room.id).emit('guess', user.name, data.guess)
+            //check for WIN
+            if(data.guess.toLowerCase().trim() === room.word.toLowerCase()){
+
+                //emit the winner to all
+                io.to(room.id).emit('winner', user.name, room.word)
+                room.users.forEach(u =>{
+                    u.ready = false
+                })
+            }
+        })
+
         //listen for drawing
         socket.on('draw', (data)=>{
             socket.to(room.id).emit('draw-line', data.start, data.end)

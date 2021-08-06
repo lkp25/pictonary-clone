@@ -7749,6 +7749,12 @@ function DrowableCanvas(canvas, socket) {
   // let w = "w"
   this.canDraw = false;
   var previousPosition = null;
+
+  this.clearCanvas = function () {
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
   canvas.addEventListener('mousemove', function (e) {
     //if left mouse button is not pressed, or the canvas is canDraw-false,exitthe function - no drawing
     if (e.buttons !== 1 || !_this.canDraw) {
@@ -7850,7 +7856,10 @@ socket.emit('join-room', {
   roomId: roomId
 });
 socket.on('start-drawer', startRoundDrawer);
-socket.on('start-guesser', startRoundGuesser); //fix the canvas scaling problem
+socket.on('start-guesser', startRoundGuesser); //if anyone entered a guess, display it for everyone
+
+socket.on('guess', displayGuess);
+socket.on('winner', endRound); //fix the canvas scaling problem
 
 window.addEventListener('resize', resizeCanvas); //setub buttons functionality
 
@@ -7899,7 +7908,17 @@ function resizeCanvas() {
   canvas.height = clientDimenstions.height;
 }
 
-function endRound() {
+function endRound(name, word) {
+  //only if round ends with winner:
+  if (name && word) {
+    //reveal the WORD to all
+    wordElement.innerText = word;
+    show(wordElement);
+    show(readyBtn); //display the winnner in the message tab:
+
+    displayGuess(null, name + ' is the winner');
+  }
+
   hide(guessForm); //no drawing possible when round ends
 
   drawbleCanvas.canDraw = false;
@@ -7916,13 +7935,23 @@ function show(element) {
 
 
 function startRoundDrawer(word) {
-  wordElement.innerText = word; //unable drawing on canvas for drawer
+  wordElement.innerText = word; //reset canvas after succesful round:
+
+  drawbleCanvas.clearCanvas(); //clear old round messages
+
+  wordElement.innerText = ''; //unable drawing on canvas for drawer
 
   drawbleCanvas.canDraw = true;
 } //guessers haw=ve the guess form available
 
 
 function startRoundGuesser() {
+  //reset canvas after succesful round:
+  drawbleCanvas.clearCanvas();
+  hide(wordElement); //clear old round messages
+
+  wordElement.innerText = ''; //start new guess form
+
   show(guessForm);
 }
 },{"socket.io-client":"node_modules/socket.io-client/build/index.js","./DrowableCanvas":"DrowableCanvas.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {

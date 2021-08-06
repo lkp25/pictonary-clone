@@ -35,7 +35,9 @@ socket.emit('join-room', {name: name, roomId: roomId})
 
 socket.on('start-drawer', startRoundDrawer)
 socket.on('start-guesser', startRoundGuesser)
-
+//if anyone entered a guess, display it for everyone
+socket.on('guess', displayGuess)
+socket.on('winner', endRound)
 
 
 //fix the canvas scaling problem
@@ -88,7 +90,16 @@ function resizeCanvas(){
 }
 
 
-function endRound(){
+function endRound(name, word){
+    //only if round ends with winner:
+    if(name && word){
+        //reveal the WORD to all
+        wordElement.innerText = word
+        show(wordElement)
+        show(readyBtn)
+        //display the winnner in the message tab:
+        displayGuess(null, name + ' is the winner')
+    }
     hide(guessForm)
     //no drawing possible when round ends
     drawbleCanvas.canDraw = false
@@ -105,11 +116,24 @@ function show(element){
 //functions for start drawer and guesser
 //drower has the word printed on screen
  function startRoundDrawer(word){
+    
     wordElement.innerText = word
+    //reset canvas after succesful round:
+    drawbleCanvas.clearCanvas()
+    
+    //clear old round messages
+    wordElement.innerText = ''
     //unable drawing on canvas for drawer
     drawbleCanvas.canDraw = true
  }
  //guessers haw=ve the guess form available
  function startRoundGuesser(){
+     //reset canvas after succesful round:
+    drawbleCanvas.clearCanvas()
+    hide(wordElement)
+    //clear old round messages
+    wordElement.innerText = ''
+    
+    //start new guess form
     show(guessForm)
  }
